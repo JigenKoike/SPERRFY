@@ -27,8 +27,12 @@ classdef NullConnectomeGeneratorModel
             obj.Description = options.Description;
         end
 
-        function [randomizedConn,newDomDef] = generate(obj)
-            [randomizedConn,newDomDef] = obj.Randomizer.apply(obj.OriginalConnectionMatrix,obj.CrossRegionInfo);
+        function [randomizedConn,newDomDef] = generate(obj,options)
+            arguments
+                obj NullConnectomeGeneratorModel
+                options.DistanceBinWidth = [];
+            end
+            [randomizedConn,newDomDef] = obj.Randomizer.apply(obj.OriginalConnectionMatrix,obj.CrossRegionInfo,"DistanceBinWidth",options.DistanceBinWidth);
         end
     end
 end

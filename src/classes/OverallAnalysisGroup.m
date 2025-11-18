@@ -97,5 +97,59 @@ classdef OverallAnalysisGroup
             yticks(0.5:0.1:1)
             axis square
         end
+
+        function holdoutPISimList = calculateHoldoutPISimilarityList(obj)
+            arguments
+                obj OverallAnalysisGroup
+            end
+            fullModelWiringPIPairs = obj.FullAnalysisModel.WiringPIPairsData;
+            THoldoutTimes = height(obj.HoldoutUnits);
+            DimPI = width(obj.HoldoutSummary.TrainMeanCorrelation);
+            holdoutPISimList = zeros(THoldoutTimes,DimPI);
+            for t = 1:THoldoutTimes
+                holdoutWiringPIPairs = obj.HoldoutUnits(t).TrainModel.WiringPIPairsData;
+                holdoutPISimList(t,:) = holdoutWiringPIPairs.calculatePISimilarities(fullModelWiringPIPairs);
+            end
+
+        end
+
+        function holdoutPIDistanceList = calculateHoldoutPIDistanceList(obj)
+            arguments
+                obj OverallAnalysisGroup
+            end
+            fullModelPIDistanceMat = obj.FullAnalysisModel.ReconstructionResultsData.PIDistanceMatrix;
+            THoldoutTimes = height(obj.HoldoutUnits);
+            [Ds,Dt] = size(fullModelPIDistanceMat);
+            holdoutPIDistanceList = zeros(Ds,Dt,THoldoutTimes);
+            for t = 1:THoldoutTimes
+                holdoutPIDistanceList(:,:,t) = obj.HoldoutUnits(t).TrainModel.ReconstructionResultsData.PIDistanceMatrix;
+            end
+        end
+
+        function [meanFPR,meanTPR] = getHoldoutROCmean(obj,options)
+            arguments
+                obj OverallAnalysisGroup
+                options.TestOrTrain = "Test";
+            end
+            fullModelFPR = obj.FullAnalysisModel.ReconstructionResultsData.FPR;
+            fullModelTPR = obj.FullAnalysisModel.ReconstructionResultsData.TPR;
+            NHoldout = length(obj.HoldoutSummary.TestAllAUCs_ROC);
+            holdoutFPRList = zeros(NHoldout,width(fullModelFPR));
+            holdoutTPRList = zeros(NHoldout,width(fullModelTPR));
+            for n = 1:NHoldout
+                switch options.TestOrTrain 
+                    case "Test"
+                        reconstResults = obj.HoldoutUnits(n).TestMetrics.TestPseudeReconstructionResults;
+                    case "Train"
+                        reconstResults = obj.HoldoutUnits(n).TrainModel.ReconstructionResultsData;
+                end
+                holdoutFPRList(n,:) = reconstResults.FPR;
+                holdoutTPRList(n,:) = reconstResults.TPR;
+            end
+            meanFPR = mean(holdoutFPRList,1);
+            meanTPR = mean(holdoutTPRList,1);
+        end
+
+
     end
 end

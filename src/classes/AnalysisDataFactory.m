@@ -91,5 +91,33 @@ classdef AnalysisDataFactory
             testSet = obj.generatePairData(holdoutSplit.TestMask, pairDataGenerationOptions, ...
                 Description = "Test - " + holdoutSplit.Description);
         end
+
+        function [srcIndList,tgtIndList] = getRegionIndPair(obj, regionMask, pairDataGenerationOptions)
+            arguments
+                obj AnalysisDataFactory
+                regionMask % [] or (:,:) logical
+                pairDataGenerationOptions PairDataGenerationOptions
+            end
+            pairDataSet = obj.generatePairData(regionMask, pairDataGenerationOptions);
+            srcIndList = pairDataSet.SourceIDs;
+            tgtIndList = pairDataSet.TargetIDs;
+        end
+
+        function [speceficMRPairListMask,srcMask,tgtMask] = getSpecificMRPairMask(obj,srcMRName,tgtMRName,pairDataGenerationOptions)
+            arguments
+                obj AnalysisDataFactory
+                srcMRName string
+                tgtMRName string
+                pairDataGenerationOptions PairDataGenerationOptions
+            end
+            [srcIndList,tgtIndList] = obj.getRegionIndPair([],pairDataGenerationOptions);
+            crossInfo = obj.CrossRegionInformation;
+            matchingRegionIndicesSource = find(crossInfo.SourceRegionInfo.RegionTable.major_region == srcMRName);
+            matchingRegionIndicesTarget = find(crossInfo.SourceRegionInfo.RegionTable.major_region == tgtMRName);
+            srcMask = ismember(srcIndList,matchingRegionIndicesSource);
+            tgtMask = ismember(tgtIndList,matchingRegionIndicesTarget);
+            speceficMRPairListMask = srcMask .* tgtMask;
+        end
+
     end
 end

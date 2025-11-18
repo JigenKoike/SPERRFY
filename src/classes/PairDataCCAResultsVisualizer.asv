@@ -14,8 +14,9 @@ classdef PairDataCCAResultsVisualizer
                 options.Color = [0 0.4470 0.7410];
                 options.ParentAxes = [];% must be 'matlab.graphics.axis.Axes' or empty
                 options.Axis0Center = true;
-                options.SignificantDigits = 3;
+                options.SignificantDigits = 2;
                 options.PIAxisLabel = "on";
+                options.FontSize = 12;
             end
             ax = getOrCreateAxes(options.ParentAxes);
             sourcePIValues = ccaResults.U(:, componentIdx);
@@ -35,8 +36,8 @@ classdef PairDataCCAResultsVisualizer
             title(titleStr);
             box('off');
             if options.PIAxisLabel == "on"
-                xlabel(strcat("{{PI}_{s}}^{(",num2str(componentIdx),")}"))
-                ylabel(strcat("{{PI}_{t}}^{(",num2str(componentIdx),")}"))
+                xlabel(strcat("{{PI}_{s}}^{(",num2str(componentIdx),")}"),"FontSize",options.FontSize)
+                ylabel(strcat("{{PI}_{t}}^{(",num2str(componentIdx),")}"),"FontSize",options.FontSize)
             end
         end
 
@@ -131,6 +132,7 @@ classdef PairDataCCAResultsVisualizer
                 DimShow (1,1) {mustBeInteger}
                 options.ParentAxes = [];
                 options.SwarmSize = 16;
+                options.SrcLabelOff logical = 1;
             end
             hAx = getOrCreateAxes(options.ParentAxes);
             load("colorList13.mat")
@@ -142,7 +144,7 @@ classdef PairDataCCAResultsVisualizer
             majorRegionNameCategoricalListSource = getMajorRegions(crossInfo.SourceRegionInfo);
             majorRegionNameCategoricalListTarget = getMajorRegions(crossInfo.TargetRegionInfo);
             xSwarmSource = categorical(majorRegionNameCategoricalListSource,srcMRNames,'Ordinal',true);
-            xSwarmTarget = categorical(majorRegionNameCategoricalListTarget);
+            xSwarmTarget = categorical(majorRegionNameCategoricalListTarget,tgtMRNames,'Ordinal',true);
             cs = makeMRColorListPerRegion(crossInfo.SourceRegionInfo);
             ct = makeMRColorListPerRegion(crossInfo.TargetRegionInfo);
             ylimList = zeros(DimShow,2);
@@ -159,7 +161,9 @@ classdef PairDataCCAResultsVisualizer
                 swarmchart(xSwarmSource,ySwarmSource,sz,cs,'filled')
                 title(strcat("{PI_s}^{(",num2str(ds),")}"))
                 ylim(ylimList(ds,:));
-                xticklabels([]);
+                if options.SrcLabelOff == 1;
+                    xticklabels([]);
+                end
             end
             for ds = 1:DimShow
                 nexttile

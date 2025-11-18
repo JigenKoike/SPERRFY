@@ -3,5 +3,11 @@ data/raw/
 data/processed/interim/
 src/classes/test/
 src/utils/old_convinience/
+src/main/main_makeAllFigures_beforeRevise.m
+src/main/main_gProfiler_analysis.m
+demonstrations_backup.m
+main_script_backup.m
+sandbox/
+
 .DS_Store
 *.asv

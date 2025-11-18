@@ -16,11 +16,12 @@ classdef MajorRegionBlockRandomizer
             obj.UseBlockwiseLogical = useBlockwise;
         end
 
-        function [randomizedMatrix,newDomDef] = apply(obj,connMat,crossInfo)
+        function [randomizedMatrix,newDomDef] = apply(obj,connMat,crossInfo,options)
             arguments 
                 obj MajorRegionBlockRandomizer 
                 connMat ConnectionMatrix
                 crossInfo CrossRegionInformation
+                options.DistanceBinWidth = [];
             end    
             origMat = connMat.Matrix;
             domDefMat = crossInfo.DomainDefineMatrix;
@@ -56,8 +57,11 @@ classdef MajorRegionBlockRandomizer
                             else
                                 subDist = [];
                             end
-    
-                            [randomizedBlock,domDefBlock] = obj.RandomizationMethod(subMat, subDomDef, subDist);
+                            if isempty(options.DistanceBinWidth) == 0
+                                [randomizedBlock,domDefBlock] = ConnectomeRandomizationMethods.distancePreservedGeneration(subMat, subDomDef, subDist,"BinWidth",options.DistanceBinWidth);
+                            else
+                                [randomizedBlock,domDefBlock] = obj.RandomizationMethod(subMat, subDomDef, subDist);
+                            end
                             newMat(srcIdx, tgtIdx) = randomizedBlock;
                             newDomDef(srcIdx,tgtIdx) = domDefBlock;
                         end

@@ -93,5 +93,19 @@ classdef BrainRegionInformation < handle
             colormap(ax,categoryColorList)
             axis off
         end
+
+        function [shuffledRegionIndex] = getShuffledRegionIndexWithinMRs(obj)
+            arguments
+                obj BrainRegionInformation
+            end
+            [~,~,MRIndexList] = getMajorRegionInfo(obj);
+            NRegion = numel(MRIndexList);
+            shuffledRegionIndex = zeros(NRegion,1);
+            [MRIDs,~,~] = unique(MRIndexList);
+            for nmr = 1:length(MRIDs)
+                idx = find(MRIndexList == nmr);
+                shuffledRegionIndex(idx) = idx(randperm(length(idx)));
+            end
+        end
     end
 end

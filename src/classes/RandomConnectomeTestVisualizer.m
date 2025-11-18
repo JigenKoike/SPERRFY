@@ -108,11 +108,11 @@ classdef RandomConnectomeTestVisualizer
             hold on
             [~,h(2)] = RandomConnectomeTestVisualizer.plotRandomTestCorrelations(globalRunner, ...
                 "Color",colorList(2,:),"DataType",options.DataType,"StdErrorBar",options.StdErrorBar,"ParentAxes",hAx, ...
-                "MarkerSize",options.MarkerSize*2,"LineWidth",options.LineWidth*2);
+                "MarkerSize",options.MarkerSize,"LineWidth",options.LineWidth);
             hold on
             [~,h(3)] = RandomConnectomeTestVisualizer.plotRandomTestCorrelations(localRunner, ...
                 "Color",colorList(3,:),"DataType",options.DataType,"StdErrorBar",options.StdErrorBar,"ParentAxes",hAx, ...
-                "MarkerSize",options.MarkerSize*2,"LineWidth",options.LineWidth*2);
+                "MarkerSize",options.MarkerSize,"LineWidth",options.LineWidth);
             box off
             ylim([-0.1,1.0001])
             ylabel("Correlation Coefficient")
@@ -145,10 +145,11 @@ classdef RandomConnectomeTestVisualizer
                 case "Train"
                     plotDataOriginal = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TrainMeanCorrelation;
                 case "Test"
-                    plotDataOriginal = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestMeanCorrelation;
+                    %plotDataOriginal = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestMeanCorrelation;
+                    plotDataOriginal = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestAllCorrelations(:,1:DimShow);
             end
             x = ones(height(plotDataOriginal),1) * (1:DimShow);
-            swarmchart(x,plotDataOriginal,options.SwarmSize*5,colorList(1,:),'filled');
+            swarmchart(x,plotDataOriginal,options.SwarmSize*2,colorList(1,:),'filled');
             hold on
             RandomConnectomeTestVisualizer.swarmRandomTestCorrelations(globalRunner,DimShow, ...
                 "Color",colorList(2,:),"DataType",options.DataType,"ParentAxes",hAx, ...
@@ -157,8 +158,9 @@ classdef RandomConnectomeTestVisualizer
             RandomConnectomeTestVisualizer.swarmRandomTestCorrelations(localRunner,DimShow, ...
                 "Color",colorList(3,:),"DataType",options.DataType,"ParentAxes",hAx, ...
                 "SwarmSize",options.SwarmSize);
-            ylabel("Correlation Coefficient")
-            xlabel("Correlation Component (Rank)")
+            ylim([-0.15,1.0001])
+            ylabel("Correlation coefficient")
+            xlabel("Correlation component (Rank)")
             box off
         end
 
@@ -190,12 +192,14 @@ classdef RandomConnectomeTestVisualizer
                     globalAUC = globalRunner.HoldoutTrainAUCMeans;
                     localAUC = localRunner.HoldoutTrainAUCMeans;
                 case "Test"
-                    originalAUC = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestMeanAUC_ROC;
+                    %originalAUC = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestMeanAUC_ROC;
+                    originalAUC = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestAllAUCs_ROC.';
+                    originalAUC_mean = connAnalysisRunner.OverallModelAndResults.HoldoutSummary.TestMeanAUC_ROC;
                     globalAUC = globalRunner.HoldoutTestAUCMeans;
                     localAUC = localRunner.HoldoutTestAUCMeans;
             end
             x = ones(size(originalAUC));
-            swarmchart(x,originalAUC,options.PlotSize,colorList(1,:),'filled');
+            swarmchart(x,originalAUC,options.SwarmSize*2,colorList(1,:),'filled');
             hold on 
             x = 2*ones(size(globalAUC));
             swarmchart(x,globalAUC,options.SwarmSize,colorList(2,:),'filled');
@@ -203,13 +207,30 @@ classdef RandomConnectomeTestVisualizer
             x = 3*ones(size(localAUC));
             swarmchart(x,localAUC,options.SwarmSize,colorList(3,:),'filled');
             hold on
-            plot([0.5,3.5],[originalAUC,originalAUC],'k')
+            %plot([0.5,3.5],[originalAUC_mean,originalAUC_mean],'k')
             xticks(1:3)
             xticklabels(["Original",strcat("Global"),strcat("Local")])
             ylim([0.45,1])
             yticks([0.5:0.1:1])
-            axis square         
+            %axis square         
         end
+
+        function h = intervalSwarm(swarmData,intervalWidth,mLocation,options)
+            arguments
+                swarmData (:,:) double % [NData, DimData]
+                intervalWidth (1,1) {mustBeInteger}
+                mLocation (1,1) {mustBeInteger}
+                options.SwarmSize = 1.5;
+                options.DimSHow = 5;
+                options.Color = [0 0 0];
+            end
+            DimShow = options.DimSHow;
+            swarmData = swarmData(:,1:DimShow);
+            xswarm = ones(height(swarmData),1) * (mLocation:intervalWidth:mLocation+intervalWidth*(DimShow-1));
+            h = swarmchart(xswarm,swarmData,options.SwarmSize,options.Color,"filled");
+        end
+
+        
 
 
     end

@@ -77,15 +77,19 @@ classdef ReconstructionResults
                 options.ScatterMarker = ".";
                 options.ScatterColor = [0.8500 0.3250 0.0980];
                 options.ScatterSize = 24;
+                options.TitleOff = false;
+                options.ReturnAx = 0;
             end
             % Get axes
             hAx = getOrCreateAxes(options.ParentAxes);
             % plot ROC
-            plot(hAx,obj.FPR, obj.TPR, 'Color',options.PlotColor,'LineStyle',options.LineStyle, ...
+            ax = plot(hAx,obj.FPR, obj.TPR, 'Color',options.PlotColor,'LineStyle',options.LineStyle, ...
                 'LineWidth',options.LineWidth,'Marker',"none");
             xlabel(hAx, 'FPR');
             ylabel(hAx, 'TPR');
-            title(hAx, sprintf('ROC Curve (AUC = %.3f)', obj.AUC_ROC));
+            if options.TitleOff == false
+                title(hAx, sprintf('ROC Curve (AUC = %.3f)', obj.AUC_ROC));
+            end
             box on
             axis square
             xlim([0,1])
@@ -98,6 +102,9 @@ classdef ReconstructionResults
                 plotTPR = obj.TPR(thresholdIndices);
                 hold on
                 scatter(hAx,plotFPR,plotTPR,options.ScatterSize,options.ScatterColor,'filled');
+            end
+            if options.ReturnAx == 1
+                hAx = ax;
             end
         end
 

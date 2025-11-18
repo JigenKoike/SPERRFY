@@ -10,12 +10,13 @@ classdef PairDataCCAResultsVisualizer
             arguments
                 ccaResults CCAResults
                 componentIdx (1,1) {mustBeInteger, mustBePositive} % Index of CCA component to plot
-                options.MarkerSize = [];
+                options.MarkerSize = 1;
                 options.Color = [0 0.4470 0.7410];
                 options.ParentAxes = [];% must be 'matlab.graphics.axis.Axes' or empty
                 options.Axis0Center = true;
-                options.SignificantDigits = 3;
+                options.SignificantDigits = 2;
                 options.PIAxisLabel = "on";
+                options.FontSize = 12;
             end
             ax = getOrCreateAxes(options.ParentAxes);
             sourcePIValues = ccaResults.U(:, componentIdx);
@@ -32,11 +33,11 @@ classdef PairDataCCAResultsVisualizer
             end
             fmt = sprintf('%%.%dg',options.SignificantDigits);
             titleStr = strcat("r_{",num2str(componentIdx),"} = ",compose(fmt,r));
-            title(titleStr);
+            title(titleStr,"FontSize",options.FontSize);
             box('off');
             if options.PIAxisLabel == "on"
-                xlabel(strcat("{{PI}_{s}}^{(",num2str(componentIdx),")}"))
-                ylabel(strcat("{{PI}_{t}}^{(",num2str(componentIdx),")}"))
+                xlabel(strcat("{{PI}_{s}}^{(",num2str(componentIdx),")}"),"FontSize",options.FontSize)
+                ylabel(strcat("{{PI}_{t}}^{(",num2str(componentIdx),")}"),"FontSize",options.FontSize)
             end
         end
 
@@ -72,6 +73,7 @@ classdef PairDataCCAResultsVisualizer
                 options.ColorList = redblue_cp;
                 options.CBarPos = "bottom";
                 options.ParentAxes = [];
+                options.FontSize = 12;
             end
             hAx = getOrCreateAxes(options.ParentAxes);
             % Extract PI values for plotting
@@ -90,7 +92,7 @@ classdef PairDataCCAResultsVisualizer
                 "ViewAzEl",options.ViewAzEl,"PlotSize",options.PlotSize, ...
                 "ParentAxes",hAx);
             titleStr = strcat("{PI_",stTag,"}^{(",num2str(componentIdx),")}");
-            title(hAx, titleStr);
+            title(hAx, titleStr,"FontSize",options.FontSize);
         end
 
         function t = tiledPlotWiringPIs3D(wiringPIPairs, dimShow, brain3D, brainInfo, options)

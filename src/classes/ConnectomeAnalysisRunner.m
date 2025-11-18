@@ -80,10 +80,13 @@ classdef ConnectomeAnalysisRunner
         function [relatedGeneAnalysisResults] = performRelatedGeneAnalysis(obj,KTopGene)
             arguments(Input)
                 obj ConnectomeAnalysisRunner
-                KTopGene (1,1) {mustBeInteger}
+                KTopGene = [];
             end
             arguments(Output)
                 relatedGeneAnalysisResults RelatedGeneAnalysisResults
+            end
+            if isempty(KTopGene) == 1;
+                KTopGene = width(obj.Factory.GeneExpressionLevels.ExpressionMatrix);
             end
             wiringPIPairs = obj.OverallModelAndResults.FullAnalysisModel.WiringPIPairsData;
             geneExprLevels = obj.Factory.GeneExpressionLevels;

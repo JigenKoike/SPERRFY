@@ -102,6 +102,7 @@ classdef RelatedGeneAnalysisResults
                 obj RelatedGeneAnalysisResults
                 DimShow (1,1) {mustBeInteger}
                 options.IsAbs logical = 1;
+                options.Color = [0 0.4470 0.7410];
             end
             t = tiledlayout(2,DimShow);
             title(t,"Gene expression distribution similarity")
@@ -117,14 +118,14 @@ classdef RelatedGeneAnalysisResults
             for duv = 1:DimShow
                 nexttile
                 corrCoeffVec = sourceCorrCoefList(:,duv);
-                histogram(corrCoeffVec,binEdges);
+                histogram(corrCoeffVec,binEdges,'FaceColor',options.Color);
                 axis square
                 title(strcat('{PI_s}^{(',num2str(duv),")}"))
             end
             for duv = 1:DimShow
                 nexttile
                 corrCoeffVec = targetCorrCoefList(:,duv);
-                histogram(corrCoeffVec,binEdges);
+                histogram(corrCoeffVec,binEdges,'FaceColor',options.Color);
                 axis square
                 title(strcat('{PI_t}^{(',num2str(duv),")}"))
             end
@@ -167,6 +168,33 @@ classdef RelatedGeneAnalysisResults
                     "ParentAxes",ax,"CBarPos","bottom","Clim",climVec);
                 titleStr = strcat(geneDisplayName," : ",compose(fmt,simScore));
                 title(titleStr);
+            end
+        end
+
+        function [sourceSimGeneTableList,targetSimGeneTableList] = makeTopGeneInformationTables_withPQValues(obj,pvalues_s,pvalues_t,qvalues_s,qvalues_t)
+            arguments(Input)
+                obj RelatedGeneAnalysisResults
+                pvalues_s (:,:) double  %[DimGene, DimPI]
+                pvalues_t (:,:) double  %[DimGene, DimPI]
+                qvalues_s (:,:) double  %[DimGene, DimPI]
+                qvalues_t (:,:) double  %[DimGene, DimPI]
+            end
+            [~, DimPI] = size(pvalues_s);
+            sourceSimGeneTableList = cell(DimPI,1);
+            targetSimGeneTableList = cell(DimPI,1);
+            columNameList = ["Gene acronym","Gene name", "Similarity score", "P-value", "Q-value (FDR)"];
+            [srcAcronymList,tgtAcronymList] = makeTopAcronymsList(obj);
+            [srcNameList,tgtNameList] = makeTopNamesList(obj);
+            [srcCorrList,tgtCorrList] = makeTopCorrsList(obj);
+            for dpi = 1:DimPI  
+                sortIds_s = obj.TopKGeneIndexListsSource(:,dpi);
+                sortIds_t = obj.TopKGeneIndexListsTarget(:,dpi);
+                sourceTable = table(srcAcronymList(:,dpi),srcNameList(:,dpi),srcCorrList(:,dpi), ...
+                    pvalues_s(sortIds_s,dpi),qvalues_s(sortIds_s,dpi),'VariableNames',columNameList);
+                targetTable = table(tgtAcronymList(:,dpi),tgtNameList(:,dpi),tgtCorrList(:,dpi), ...
+                    pvalues_t(sortIds_t,dpi),qvalues_t(sortIds_t,dpi),'VariableNames',columNameList);
+                sourceSimGeneTableList{dpi,1} = sourceTable;
+                targetSimGeneTableList{dpi,1} = targetTable;
             end
         end
 

@@ -62,6 +62,16 @@ classdef GeneExpressionLevels < handle
             info = obj.PCAInfo;
         end
 
+        function [shuffledExprMatrix] = makeRegionShuffledGeneExprLevels_withinMR(obj,brainInfo)
+            arguments
+                obj GeneExpressionLevels
+                brainInfo BrainRegionInformation
+            end
+            shuffledRegionIndex = brainInfo.getShuffledRegionIndexWithinMRs();
+            shuffledExprMatrix = obj.ExpressionMatrix(shuffledRegionIndex,:);
+        end
+
+
         
 
     end

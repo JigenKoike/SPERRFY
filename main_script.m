@@ -16,9 +16,9 @@ mouseConnectomeDataAnalysis = ConnectomeAnalysisRunner(connectomeMatrix, geneExp
     pairDataGenerationOptions,reconstructionParameters,holdoutParameters_main,"FactoryDescription","Main Data Analysis");
 mouseConnectomeDataAnalysis = mouseConnectomeDataAnalysis.runAnalysis(ReconstructionStoreTag=true);
 
+
 %% Perform gene analysis
-KTopGene = 30;
-relatedGeneAnalysisResults = mouseConnectomeDataAnalysis.performRelatedGeneAnalysis(KTopGene);
+relatedGeneAnalysisResults = mouseConnectomeDataAnalysis.performRelatedGeneAnalysis();
 
 %% Perform null connectome analysis
 
@@ -36,8 +36,12 @@ nullGenerator_6 = NullConnectomeGeneratorModel(connectomeMatrix,crossInfo,"Netwo
     "Description","RandomGeneration, Locally");
 % sample matrix
 rng(2)
-randomConnectomeSample_global = nullGenerator_1.generate;
-randomConnectomeSample_local = nullGenerator_2.generate;
+randomConnectomeSample_1 = nullGenerator_1.generate;
+randomConnectomeSample_2 = nullGenerator_2.generate;
+randomConnectomeSample_3 = nullGenerator_3.generate;
+randomConnectomeSample_4 = nullGenerator_4.generate;
+randomConnectomeSample_5 = nullGenerator_5.generate;
+randomConnectomeSample_6 = nullGenerator_6.generate;
 % run
 rng(3)
 nullBatchRunner_1 = NullModelAnalysisBatchRunner(nullGenerator_1,numRandomConnectome,holdoutParameters_nulls);
@@ -75,6 +79,8 @@ for l = 1:L_PCList
     end
 end
 
+%%
+main_additional_analysis;
 
 %% Save data
 cd(strcat(projectRoot,"/results/calculatedVariables"));
@@ -87,4 +93,4 @@ cd(projectRoot);
 
 %% Make Figures
 
-main_makeAllFigures;
+% main_makeAllFigures;

@@ -74,13 +74,13 @@ classdef RelatedGeneAnalysisResults
 
 
 
-        function [sourceTableList,targetTableList] = makeTopGeneInformationTables(obj,DimPI)
+        function [sourceSimGeneTableList,targetSimGeneTableList] = makeTopGeneInformationTables(obj,DimPI)
             arguments(Input)
                 obj RelatedGeneAnalysisResults
                 DimPI (1,1) {mustBeInteger}
             end
-            sourceTableList = cell(DimPI,1);
-            targetTableList = cell(DimPI,1);
+            sourceSimGeneTableList = cell(DimPI,1);
+            targetSimGeneTableList = cell(DimPI,1);
             columNameList = ["Gene acronym","Gene name", "Similarity score"];
             [srcAcronymList,tgtAcronymList] = makeTopAcronymsList(obj);
             [srcNameList,tgtNameList] = makeTopNamesList(obj);
@@ -90,8 +90,8 @@ classdef RelatedGeneAnalysisResults
                     'VariableNames',columNameList);
                 targetTable = table(tgtAcronymList(:,dpi),tgtNameList(:,dpi),tgtCorrList(:,dpi), ...
                     'VariableNames',columNameList);
-                sourceTableList{dpi,1} = sourceTable;
-                targetTableList{dpi,1} = targetTable;
+                sourceSimGeneTableList{dpi,1} = sourceTable;
+                targetSimGeneTableList{dpi,1} = targetTable;
             end
         end
         %}
@@ -150,9 +150,9 @@ classdef RelatedGeneAnalysisResults
                 geneDisplayName = geneAcronymsSource(1,dpi);
                 simScore = simScoreSource(1,dpi);
                 regionalGeneExpressionVector = geneExpressionMatrix(:,geneIndex);
-                climWidth = max()
+                climVec = [-max(abs(regionalGeneExpressionVector)),max(abs(regionalGeneExpressionVector))];
                 Brain3DStructureVisualizer.imageBrainRegionalValuesIn3D(regionalGeneExpressionVector,brainSpace3D,brainInfo, ...
-                    "ParentAxes",ax,"CBarPos","bottom");
+                    "ParentAxes",ax,"CBarPos","bottom","Clim",climVec);
                 titleStr = strcat(geneDisplayName," : ",compose(fmt,simScore));
                 title(titleStr);
             end
@@ -162,10 +162,36 @@ classdef RelatedGeneAnalysisResults
                 geneDisplayName = geneAcronymsTarget(1,dpi);
                 simScore = simScoreTarget(1,dpi);
                 regionalGeneExpressionVector = geneExpressionMatrix(:,geneIndex);
+                climVec = [-max(abs(regionalGeneExpressionVector)),max(abs(regionalGeneExpressionVector))];
                 Brain3DStructureVisualizer.imageBrainRegionalValuesIn3D(regionalGeneExpressionVector,brainSpace3D,brainInfo, ...
-                    "ParentAxes",ax,"CBarPos","bottom");
+                    "ParentAxes",ax,"CBarPos","bottom","Clim",climVec);
                 titleStr = strcat(geneDisplayName," : ",compose(fmt,simScore));
                 title(titleStr);
+            end
+        end
+
+        function [sourceSimGeneTableList,targetSimGeneTableList] = makeTopGeneInformationTables_withPQValues(obj,pvalues_s,pvalues_t,qvalues_s,qvalues_t)
+            arguments(Input)
+                obj RelatedGeneAnalysisResults
+                pvalues_s (:,:) double  %[DimGene, DimPI]
+                pvalues_t (:,:) double  %[DimGene, DimPI]
+                qvalues_s (:,:) double  %[DimGene, DimPI]
+                qvalues_t (:,:) double  %[DimGene, DimPI]
+            end
+            [DimGene, DimPI] = size()
+            sourceSimGeneTableList = cell(DimPI,1);
+            targetSimGeneTableList = cell(DimPI,1);
+            columNameList = ["Gene acronym","Gene name", "Similarity score"];
+            [srcAcronymList,tgtAcronymList] = makeTopAcronymsList(obj);
+            [srcNameList,tgtNameList] = makeTopNamesList(obj);
+            [srcCorrList,tgtCorrList] = makeTopCorrsList(obj);
+            for dpi = 1:DimPI  
+                sourceTable = table(srcAcronymList(:,dpi),srcNameList(:,dpi),srcCorrList(:,dpi), ...
+                    'VariableNames',columNameList);
+                targetTable = table(tgtAcronymList(:,dpi),tgtNameList(:,dpi),tgtCorrList(:,dpi), ...
+                    'VariableNames',columNameList);
+                sourceSimGeneTableList{dpi,1} = sourceTable;
+                targetSimGeneTableList{dpi,1} = targetTable;
             end
         end
 

@@ -128,5 +128,20 @@ classdef CrossRegionInformation < handle
             trainMask(linIdx(trainIdx)) = true;
             testMask(linIdx(testIdx)) = true;
         end
+
+
+        function [MRPairMask] = makeSpecificMRPairMask(obj, sourceMRName, targetMRName)
+            arguments(Input)
+                obj CrossRegionInformation
+                sourceMRName string
+                targetMRName string
+            end
+            sourceMRLogical = (obj.SourceRegionInfo.RegionTable.major_region == sourceMRName);
+            targetMRLogical = (obj.TargetRegionInfo.RegionTable.major_region == targetMRName);
+            MRPairMask = sourceMRLogical * targetMRLogical' ;           
+        end
+
+
+
     end
 end
